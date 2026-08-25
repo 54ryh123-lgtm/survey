@@ -130,11 +130,15 @@ function assignCondition() {
   }
 }
 
-// 외부 fetch POST 백업 — HTML Service가 아니라 별도 webapp으로 배포 시 사용
 function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
-    const result = submitSurvey(data);
+    let result;
+    if (data.action === 'assignCondition') {
+      result = { condition: assignCondition() };
+    } else {
+      result = submitSurvey(data);
+    }
     return ContentService.createTextOutput(JSON.stringify(result))
       .setMimeType(ContentService.MimeType.JSON);
   } catch (error) {
