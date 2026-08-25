@@ -1866,12 +1866,13 @@ function buildScale(containerId, prefix, items, scale, labels) {
   html += '</tbody></table>';
   c.innerHTML = html;
 }
-function readScale(prefix, count) {
+function readScale(prefix, count, keyMap) {
   const out = {};
   for (let i = 1; i <= count; i++) {
     const sel = document.querySelector(`input[name="${prefix}_q${i}"]:checked`);
     if (!sel) return null;
-    out['q' + i] = sel.value;
+    const key = keyMap ? keyMap[i - 1] : ('q' + i);
+    out[key] = sel.value;
   }
   return out;
 }
