@@ -9,6 +9,7 @@
 
 const SHEET_NAME = '설문응답';
 const HTML_FILE  = 'Index';   // Index.html 파일명과 동일하게 유지
+const NOTIFY_EMAIL = '54ryh123@pusan.ac.kr'; // 알림 받을 이메일
 
 // HTML 웹앱 서빙
 function doGet() {
@@ -19,12 +20,50 @@ function doGet() {
 
 // HTML에서 google.script.run.submitSurvey(data) 로 직접 호출
 function submitSurvey(data) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  let sheet = ss.getSheetByName(SHEET_NAME);
-  if (!sheet) { sheet = ss.insertSheet(SHEET_NAME); createHeaders(sheet); }
-  if (sheet.getLastRow() === 0) createHeaders(sheet);
-  appendDataRow(sheet, data);
-  return { result: 'success', row: sheet.getLastRow() };
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let sheet = ss.getSheetByName(SHEET_NAME);
+    if (!sheet) { sheet = ss.insertSheet(SHEET_NAME); createHeaders(sheet); }
+    if (sheet.getLastRow() === 0) createHeaders(sheet);
+
+    // 6.2 중복 응답 방지 (SONA ID가 입력된 경우에만 체크)
+    if (data.sonaId && data.sonaId.trim() !== '') {
+      const lastRow = sheet.getLastRow();
+      if (lastRow >= 2) {
+        const sonaIds = sheet.getRange(2, 4, lastRow - 1, 1).getValues(); // D열: SONA_ID
+        const isDuplicate = sonaIds.some(row => String(row[0]).trim() === data.sonaId.trim());
+        if (isDuplicate) {
+          return { result: 'error', error: 'DUPLICATE_SONA_ID' };
+        }
+      }
+    }
+
+    appendDataRow(sheet, data);
+    sendNewResponseEmail(data);
+
+    return { result: 'success', row: sheet.getLastRow() };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+// 6.3 새 응답 제출 시 이메일 알림
+function sendNewResponseEmail(data) {
+  try {
+    const subject = '[설문 응답] 새 응답이 제출되었습니다';
+    const body =
+      '새로운 설문 응답이 접수되었습니다.\n\n' +
+      '제출시각: ' + (data.timestamp || '') + '\n' +
+      '조건번호: ' + (data.condition || '') + '\n' +
+      'SONA ID: ' + (data.sonaId || '(미입력)') + '\n' +
+      '성별: ' + (data.gender || '') + '\n' +
+      '연령: ' + (data.age || '');
+    MailApp.sendEmail(NOTIFY_EMAIL, subject, body);
+  } catch (err) {
+    Logger.log('이메일 발송 실패: ' + err.toString());
+  }
 }
 
 // ============================================================
@@ -41,19 +80,51 @@ function assignCondition() {
     if (!sheet) { sheet = ss.insertSheet(SHEET_NAME); createHeaders(sheet); }
     if (sheet.getLastRow() === 0) createHeaders(sheet);
 
-    const counts = [0,0,0,0,0,0,0,0]; // 조건 1~8
-    const lastRow = sheet.getLastRow();
-    if (lastRow >= 2) {
-      const values = sheet.getRange(2, 2, lastRow - 1, 1).getValues(); // B열(조건번호)
-      for (let i = 0; i < values.length; i++) {
-        const c = parseInt(values[i][0], 10);
-        if (c >= 1 && c <= 8) counts[c-1]++;
+    const MAX_PER_CONDITION = 40;
+    const cache = CacheService.getScriptCache();
+    const cachedCounts = cache.get('condition_counts');
+    let counts;
+
+    // 캐시 있으면 사용, 없으면 시트에서 읽고 캐시에 저장
+    if (cachedCounts) {
+      counts = JSON.parse(cachedCounts);
+    } else {
+      counts = [0,0,0,0,0,0,0,0];
+      const lastRow = sheet.getLastRow();
+      if (lastRow >= 2) {
+        const values = sheet.getRange(2, 2, lastRow - 1, 1).getValues();
+        for (let i = 0; i < values.length; i++) {
+          const c = parseInt(values[i][0], 10);
+          if (c >= 1 && c <= 8) counts[c-1]++;
+        }
+      }
+      cache.put('condition_counts', JSON.stringify(counts), 60); // 60초 캐시
+    }
+
+    // 40명 미만 조건들 중 카운트 최소값 찾기
+    let minCount = MAX_PER_CONDITION;
+    for (let i = 0; i < 8; i++) {
+      if (counts[i] < MAX_PER_CONDITION && counts[i] < minCount) {
+        minCount = counts[i];
       }
     }
-    const minCount = Math.min.apply(null, counts);
     const candidates = [];
-    for (let i = 0; i < 8; i++) if (counts[i] === minCount) candidates.push(i + 1);
-    return candidates[Math.floor(Math.random() * candidates.length)];
+    for (let i = 0; i < 8; i++) {
+      if (counts[i] < MAX_PER_CONDITION && counts[i] === minCount) {
+        candidates.push(i + 1);
+      }
+    }
+
+    // 모든 조건이 40명 도달 → 마감
+    if (candidates.length === 0) return -1;
+
+    const chosen = candidates[Math.floor(Math.random() * candidates.length)];
+
+    // 캐시 업데이트 (방금 배정한 조건 +1) — 다음 사용자도 빠르게 응답
+    counts[chosen - 1]++;
+    cache.put('condition_counts', JSON.stringify(counts), 60);
+
+    return chosen;
   } finally {
     lock.releaseLock();
   }
@@ -80,10 +151,10 @@ function createHeaders(sheet) {
     '제출시각', '조건번호',
     // 기본정보
     '동의여부', 'SONA_ID', '성별', '연령',
-    // Q3 (7점, 3문항) — AI 활용습관
-    'Q3_1','Q3_2','Q3_3',
-    // Q4 (5점, 8문항) — NFC
-    'Q4_1','Q4_2','Q4_3','Q4_4','Q4_5','Q4_6','Q4_7','Q4_8',
+    // Q3 — AI 활용습관
+    'Q3_habit_1','Q3_habit_2','Q3_habit_3',
+    // Q4 — NFC
+    'Q4_noc_1','Q4_noc_2','Q4_noc_3','Q4_noc_4','Q4_noc_5','Q4_noc_6','Q4_noc_7','Q4_noc_8',
     // 시나리오 1
     '시나리오1_초기선택','시나리오1_AI확인','시나리오1_최종선택','시나리오1_선택변경여부',
     // 시나리오 2
@@ -92,12 +163,12 @@ function createHeaders(sheet) {
     '시나리오3_초기선택','시나리오3_AI확인','시나리오3_최종선택','시나리오3_선택변경여부',
     // 시나리오 4
     '시나리오4_초기선택','시나리오4_AI확인','시나리오4_최종선택','시나리오4_선택변경여부',
-    // Q14 (7점, 8문항)
-    'Q14_1','Q14_2','Q14_3','Q14_4','Q14_5','Q14_6','Q14_7','Q14_8',
-    // Q15 (7점, 4문항)
-    'Q15_1','Q15_2','Q15_3','Q15_4',
-    // Q16 (7점, 3문항)
-    'Q16_1','Q16_2','Q16_3'
+    // Q14
+    'Q14_conf_1','Q14_conf_2','Q14_conf_3','Q14_trust_1','Q14_trust_2','Q14_trust_3','Q14_frame_1','Q14_frame_2',
+    // Q15
+    'Q15_resp_1','Q15_resp_2','Q15_resp_3','Q15_resp_4',
+    // Q16
+    'Q16_advice_1','Q16_advice_2','Q16_advice_3'
   ];
   sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
   const headerRange = sheet.getRange(1, 1, 1, headers.length);
@@ -118,7 +189,7 @@ function appendDataRow(sheet, data) {
 
   const row = [
     // 메타
-    data.timestamp || new Date().toISOString(),
+    Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss'),
     data.condition || '',
     // 기본정보
     data.consent || '',
@@ -126,10 +197,10 @@ function appendDataRow(sheet, data) {
     data.gender  || '',
     data.age     || '',
     // Q3
-    q3.q1 || '', q3.q2 || '', q3.q3 || '',
+    q3.habit_1 || '', q3.habit_2 || '', q3.habit_3 || '',
     // Q4 (8)
-    q4.q1 || '', q4.q2 || '', q4.q3 || '', q4.q4 || '',
-    q4.q5 || '', q4.q6 || '', q4.q7 || '', q4.q8 || '',
+    q4.noc_1 || '', q4.noc_2 || '', q4.noc_3 || '', q4.noc_4 || '',
+    q4.noc_5 || '', q4.noc_6 || '', q4.noc_7 || '', q4.noc_8 || '',
     // 시나리오 1
     data.scenario1_choice || '',
     data.scenario1_ai_confirmed ? 'TRUE' : 'FALSE',
@@ -151,12 +222,13 @@ function appendDataRow(sheet, data) {
     data.scenario4_final_choice || '',
     data.scenario4_changed ? 'TRUE' : 'FALSE',
     // Q14
-    q14.q1||'', q14.q2||'', q14.q3||'', q14.q4||'',
-    q14.q5||'', q14.q6||'', q14.q7||'', q14.q8||'',
+    q14.conf_1||'', q14.conf_2||'', q14.conf_3||'',
+    q14.trust_1||'', q14.trust_2||'', q14.trust_3||'',
+    q14.frame_1||'', q14.frame_2||'',
     // Q15
-    q15.q1||'', q15.q2||'', q15.q3||'', q15.q4||'',
+    q15.resp_1||'', q15.resp_2||'', q15.resp_3||'', q15.resp_4||'',
     // Q16
-    q16.q1||'', q16.q2||'', q16.q3||''
+    q16.advice_1||'', q16.advice_2||'', q16.advice_3||''
   ];
 
   sheet.appendRow(row);
@@ -173,19 +245,19 @@ function testSubmit() {
     timestamp: new Date().toISOString(),
     condition: 1,
     consent: 'yes',
-    sonaId: '123456',
+    sonaId: ' ',
     gender: 'female',
     age: 22,
-    q3: { q1:'5', q2:'6', q3:'7' },
-    q4: { q1:'3', q2:'4', q3:'5', q4:'3', q5:'4', q6:'5', q7:'3', q8:'4' },
+    q3: { habit_1:'5', habit_2:'6', habit_3:'7' },
+    q4: { noc_1:'3', noc_2:'4', noc_3:'5', noc_4:'3', noc_5:'4', noc_6:'5', noc_7:'3', noc_8:'4' },
     scenario1_choice:'A', scenario1_ai_confirmed:true, scenario1_final_choice:'B', scenario1_changed:true,
     scenario2_choice:'B', scenario2_ai_confirmed:true, scenario2_final_choice:'B', scenario2_changed:false,
     scenario3_choice:'A', scenario3_ai_confirmed:true, scenario3_final_choice:'A', scenario3_changed:false,
     scenario4_choice:'B', scenario4_ai_confirmed:true, scenario4_final_choice:'A', scenario4_changed:true,
-    q14: { q1:'5', q2:'6', q3:'7', q4:'5', q5:'6', q6:'7', q7:'5', q8:'6' },
-    q15: { q1:'5', q2:'6', q3:'7', q4:'5' },
-    q16: { q1:'5', q2:'6', q3:'7' }
+    q14: { conf_1:'5', conf_2:'6', conf_3:'7', trust_1:'5', trust_2:'6', trust_3:'7', frame_1:'5', frame_2:'6' },
+    q15: { resp_1:'5', resp_2:'6', resp_3:'7', resp_4:'5' },
+    q16: { advice_1:'5', advice_2:'6', advice_3:'7' }
   };
-  submitSurvey(testData);
-  Logger.log('테스트 데이터 추가 완료');
+  const result = submitSurvey(testData);
+ Logger.log('결과: ' + JSON.stringify(result));
 }
