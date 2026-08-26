@@ -1733,18 +1733,33 @@ let __koreanVoice = null;
   }
 })();
 
+const ua = navigator.userAgent;
+const isIOSDevice = /iPad|iPhone|iPod/.test(ua) ||
+  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const isMacSafari = /Macintosh/.test(ua) && /Safari/.test(ua) && !/Chrome|Chromium|Edg/.test(ua);
+const __isAppleTTS = isIOSDevice || isMacSafari;
+
 function speakSentences(sentences, idx) {
   if (idx >= sentences.length) return;
   const u = new SpeechSynthesisUtterance(sentences[idx]);
   u.lang = 'ko-KR';
-  u.rate = (idx === sentences.length - 1) ? 0.96 : 0.99;
-  u.pitch = (idx === sentences.length - 1) ? 0.85 : 0.89;
+  const isLast = idx === sentences.length - 1;
+
+  if (__isAppleTTS) {
+    u.rate = isLast ? 0.82 : 0.85;
+    u.pitch = isLast ? 0.95 : 1.0;
+  } else {
+    u.rate = isLast ? 0.96 : 0.99;
+    u.pitch = isLast ? 0.85 : 0.89;
+  }
+
   u.volume = 1.0;
   if (__koreanVoice) u.voice = __koreanVoice;
-  u.onend = () => setTimeout(() => speakSentences(sentences, idx + 1), 145);
+  const gap = __isAppleTTS ? 260 : 145;
+  u.onend = () => setTimeout(() => speakSentences(sentences, idx + 1), gap);
   speechSynthesis.speak(u);
 }
-
+  
 function autoSpeak(stepId) {
   if (typeof speechSynthesis === 'undefined') return;
   let parts = [];
