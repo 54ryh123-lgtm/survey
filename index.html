@@ -1747,7 +1747,7 @@ function speakSentences(sentences, idx) {
 
   if (__isAppleTTS) {
     u.rate = isLast ? 0.82 : 0.85;
-    u.pitch = isLast ? 0.86 : 0.92;
+    u.pitch = isLast ? 0.82 : 0.87;
   } else {
     u.rate = isLast ? 0.96 : 0.99;
     u.pitch = isLast ? 0.85 : 0.89;
@@ -1794,6 +1794,7 @@ function autoSpeak(stepId) {
   const text = parts.join('. ')
     .replace(/[※☞]/g, '')
     .replace(/→/g, ' ')
+    .replace(/\bAI\b/g, '에이아이')
     .replace(/\s+/g, ' ')
     .trim();
   if (!text) return;
