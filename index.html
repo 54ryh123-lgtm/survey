@@ -4,7 +4,7 @@
   <base target="_top">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI 조언 방식이 의사결정에 미치는 영향에 대한 연구</title>
+  <title>AI 도입 상황에서의 팀 프로젝트 의사결정 연구</title>
   <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
 
   <style>
@@ -92,6 +92,7 @@
     .scenario-box {
       background: #f8fafc; padding: 2rem; border-radius: 12px;
       margin-bottom: 1.25rem; font-size: 1.05rem; line-height: 1.85;
+      word-break: keep-all;
     }
     .choice-container { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 0.75rem; }
     .choice-label {
@@ -155,7 +156,7 @@
     .form-group { margin-bottom: 1.5rem; }
     .form-group > label { display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-main); }
     .form-group input[type="text"], .form-group input[type="number"] {
-      width: 100%; padding: 0.85rem 1rem;
+      width: 100%; max-width: 48%; padding: 0.85rem 1rem;
       border: 2px solid var(--border); border-radius: 10px;
       font-size: 1rem; font-family: inherit;
     }
@@ -180,14 +181,15 @@
       flex: 1; max-width: 220px;
       padding: 1.4rem 2rem; border-radius: 14px;
       font-weight: 700; font-size: 1.25rem;
-      cursor: pointer; border: none; color: white;
-      transition: all 0.2s; font-family: inherit;
+      cursor: pointer; font-family: inherit;
+      background: #fff; color: #4f46e5; border: 2px solid #4f46e5;
+      transition: all 0.2s;
     }
-    .consent-yes { background: #93c5fd; }
-    .consent-yes:hover { background: #60a5fa; transform: translateY(-2px); }
-    .consent-no { background: #fca5a5; }
-    .consent-no:hover { background: #f87171; transform: translateY(-2px); }
-
+    .consent-yes:hover, .consent-no:hover,
+    .consent-yes.selected, .consent-no.selected {
+      background: #4f46e5; color: #fff;
+      transform: translateY(-2px);
+    }
     /* 자세히 보기 디테일 박스 */
     .detail-content {
       max-height: 540px; overflow-y: auto;
@@ -261,16 +263,6 @@
   /* ===== 시나리오 줄 간격 더 좁히고, 두 가지 방안 위 공백 늘리기 ===== */
     .scenario-box { line-height: 1.5; }
     .red-text { margin: 1.75rem 0 0.75rem 0; }
-
-    /* ===== 동의서 예/아니오 — 테두리만 컬러 ===== */
-    .consent-yes, .consent-no {
-      background: white !important;
-      border: 2px solid !important;
-    }
-    .consent-yes { color: #2563eb !important; border-color: #93c5fd !important; }
-    .consent-yes:hover { background: #eff6ff !important; border-color: #60a5fa !important; }
-    .consent-no { color: #dc2626 !important; border-color: #fca5a5 !important; }
-    .consent-no:hover { background: #fef2f2 !important; border-color: #f87171 !important; }
 
   /* ===== 시나리오 페이지 공백 줄이기 ===== */
     .scenario-box { padding: 1.5rem; margin-bottom: 2rem; line-height: 1.7; }
@@ -418,20 +410,6 @@
       flex: 1 !important;
     }
 
-  /* 동의서 — 선택된 버튼 강조 */
-    .consent-yes.selected {
-      background: #eff6ff !important;
-      color: #1e3a8a !important;
-      border-color: #3b82f6 !important;
-      font-weight: 700 !important;
-    }
-    .consent-no.selected {
-      background: #fef2f2 !important;
-      color: #991b1b !important;
-      border-color: #ef4444 !important;
-      font-weight: 700 !important;
-    }
-
   /* AI 확인 — 박스 없애고 한 줄로 */
     .ai-confirm {
       background: transparent !important;
@@ -556,32 +534,37 @@
     /* ===== 신뢰도 문구 — 박스 없애고 굵은 텍스트로 ===== */
 .ai-trust-line {
   position: relative !important;
-  margin: 0 0 1rem 0 !important;
-  padding: 0 0 0 1.5rem !important;
+  margin: 0 0 1.5rem 0 !important;
+  padding: 0 0 0 1.6rem !important;
   background: transparent !important;
-  border-left: none !important;
+  border: none !important;
   border-radius: 0 !important;
-  font-size: 1.1rem !important;
-  font-weight: 700 !important;
+  font-size: 1.02rem !important;
+  font-weight: 600 !important;
   color: #1f2937 !important;
-  line-height: 1.6 !important;
+  line-height: 1.7 !important;
+  word-break: keep-all !important;
 }
 .ai-trust-line::before {
   content: "ℹ️";
   position: absolute;
   left: 0;
-  top: 0.05rem;
-  font-size: 1rem;
+  top: 0.1rem;
+  font-size: 1.05rem;
 }
 .ai-trust-line strong {
-  color: var(--primary) !important;
+  padding: 0.12rem 0.3rem !important;
+  background: #e0e7ff !important;
+  border-radius: 6px !important;
+  font-size: 1.12rem !important;
   font-weight: 800 !important;
-  text-decoration: underline !important;
-  text-decoration-color: #a5b4fc !important;
-  text-decoration-thickness: 3px !important;
-  text-underline-offset: 3px !important;
+  color: var(--primary) !important;
+  text-decoration: none !important;
 }
 .ai-trust-line:empty { display: none; }
+
+/* 본문 단어 중간 줄바꿈 방지 */
+.description { word-break: keep-all; }
 
 /* ===== A안/B안 — 성별 박스처럼 단일 색(인디고)으로 통일 ===== */
 .choice-label:has(input[value="A"]),
@@ -600,6 +583,8 @@
   color: var(--primary) !important;
   font-weight: 700 !important;
 }
+.detail-arrow { display:inline-block; transition: transform .15s; }
+#detail-toggle-cb:checked ~ .detail-arrow { transform: rotate(90deg); }
 
   </style>
 </head>
@@ -608,7 +593,7 @@
 
 <div class="container">
   <div id="progress-indicator">
-    <div class="progress-label"><span id="progress-current">1</span> / <span id="progress-total">19</span></div>
+    <div class="progress-label"><span id="progress-current">1</span> / <span id="progress-total">18</span></div>
     <div class="progress-track">
       <div id="progress-bar" class="progress-fill"></div>
     </div>
@@ -618,7 +603,7 @@
     <!-- ========== 1. 연구 설명문 요약 ========== -->
     <div class="step active" id="step-intro">
       <div class="card">
-        <h2 style="text-align:center;border-bottom: 1px solid #9ca3af; padding-bottom: 1rem;">AI 조언 방식이 의사결정에 미치는 영향에 대한 연구</h2>
+        <h2 style="text-align:center;border-bottom: 1px solid #9ca3af; padding-bottom: 1rem;">AI 도입 상황에서의 팀 프로젝트 의사결정 연구</h2>
         <h3 style="text-align:center; font-weight:700; font-size:1.5rem; margin: 2rem 0 1.25rem; color:#1f2937; border:none;">연구 참여 설명문</h3>
         <div class="description" style="text-align:center; background:#eef2ff; padding:1.75rem 1.75rem; border-radius:12px; font-size:1.0rem; white-space:normal;">
         <div style="margin-bottom:0.5rem;">본 연구는 AI의 조언 방식이 사람들의 의사결정에 미치는 영향을 알아보기 위한 학술 연구입니다.</div>
@@ -626,13 +611,13 @@
         <div style="margin-bottom:0.5rem;">소요시간은 약 20분입니다.</div>
         <div style="margin-bottom:0.5rem;">수집되는 자료는 익명으로 처리되며 연구 목적 외에는 사용되지 않습니다.</div>
         <div style="margin-bottom:0.5rem;">참여는 자발적이며, 언제든 이유 없이 중단하실 수 있고 어떠한 불이익도 없습니다.</div>
-        <div style="margin-bottom:0.5rem;">SONA를 통해 참여하시는 분께는 수업 내 가산 크레딧 1점이 제공되며, 참여 여부는 담당 교수에게 공개되지 않습니다.</div>
-        <div style="margin-bottom:0.5rem;">원활한 설문 참여를 위해 테블릿 또는 PC의 조용한 환경에서 진행해 주시기 바랍니다.</div>
+        <div style="margin-bottom:0.5rem;">SONA를 통해 참여하시는 분께는 수업 내 가산 크레딧 1점이 제공되며, <br>참여 여부는 담당 교수에게 공개되지 않습니다.</div>
+        <div style="margin-bottom:0.5rem;">원활한 설문 참여를 위해 태블릿 또는 PC의 조용한 환경에서 진행해 주시기 바랍니다.</div>
         <div>아래 '자세히 보기'로 상세 내용을 확인하신 후, 동의 여부를 결정해 주시기 바랍니다.</div>
         </div>
-        <label class="detail-toggle" style="cursor:pointer;">
-          <input type="checkbox" id="detail-toggle-cb" style="display:none;" onchange="toggleIntroDetail()">
-          <span class="detail-check"></span> 자세히 보기
+        <label class="detail-toggle" style="cursor:pointer; display:flex; width:fit-content; margin:1.25rem 0; align-items:center; justify-content:center; gap:0.5rem; padding:0.55rem 1.1rem; border:1.5px solid #c7d2fe; border-radius:999px; background:#fff; color:#4f46e5; font-weight:700; font-size:0.98rem;">
+        <input type="checkbox" id="detail-toggle-cb" style="display:none;" onchange="toggleIntroDetail()">
+        <span class="detail-arrow" style="font-size:0.85rem;">▶</span>자세히 보기
         </label>
         <div id="intro-detail-inline" style="display:none; margin-top:1rem;">
           <div class="detail-content">
@@ -701,8 +686,9 @@
           <p>본 연구는 부산대학교 생명윤리위원회가 승인하였으며 본 연구의 참가자(연구대상자)로서 귀하의 권리에 대해 질문 있으시면 부산대학교 생명윤리위원회 행정간사(051-510-3677, irb@pusan.ac.kr)에게 문의하실 수 있습니다.</p>
         </div>
         </div>
+        <hr style="border:0; border-top:1px solid #9ca3af; margin:1.5rem 0 0;">
         <h2 style="text-align:center; border:none; margin-top:2.5rem;">연구 참여 동의서</h2>
-        <div class="description" style="text-align:center; background:#f5f5f7; padding:1.75rem 1.75rem; border-radius:12px; white-space:normal;">
+        <div class="description" style="text-align:left; background:#f5f5f7; padding:1.75rem 1.75rem; border-radius:12px; white-space:normal;">
 <div style="margin-bottom:0.5rem;">1. 본인은 본 연구의 설명문을 읽었으며 연구 내용에 대해 충분히 이해하였습니다.</div>
 <div style="margin-bottom:0.5rem;">2. 본인은 이 연구에 참여함으로써 발생하는 위험과 이득에 관하여 충분히 알고 있습니다.</div>
 <div style="margin-bottom:0.5rem;">3. 본인은 이 연구에 참여하는 것에 대하여 자발적으로 동의합니다.</div>
@@ -725,11 +711,11 @@
     <div class="step" id="step-no-consent">
       <div class="card">
         <h2 style="text-align:center; border:none;">연구 참여 비동의 안내</h2>
-        <div class="description" style="white-space:normal;">
+        <div class="description" style="white-space:normal; background:#f5f5f7; padding:1.75rem; border-radius:12px;">
         <div style="margin-bottom:0.75rem;">본 연구에 관심을 가져주셔서 감사합니다.</div>
         <div style="margin-bottom:0.75rem;">연구 참여 동의서에 '동의하지 않음'을 선택하셨으므로, 설문은 진행되지 않고 여기서 종료됩니다.</div>
         <div style="margin-bottom:0.75rem;">귀하께서 응답하신 내용은 별도로 저장되거나 수집되지 않으므로 안심하시기 바랍니다.</div>
-        <div style="margin-bottom:0.75rem;">혹시 실수로 클릭하셨다면 창을 새로고침 하여 다시 시작하실 수 있습니다.</div>
+        <div style="margin-bottom:0.75rem;">혹시 실수로 클릭하셨다면 창을 새로고침하여 다시 시작하실 수 있습니다.</div>
         <div>소중한 시간을 내어주셔서 다시 한 번 감사드립니다.</div>
       </div>
     </div>
@@ -740,8 +726,8 @@
       <div class="card">
         <h2>기본 정보</h2>
         <div class="form-group">
-          <label for="sonaId">SONA ID (숫자 6자리)<span style="color:var(--text-muted); font-weight:400; font-size:0.9rem;"> — 있으신 경우에만 입력</span></label>
-          <input type="text" id="sonaId" maxlength="6" inputmode="numeric">
+          <label for="sonaId">SONA ID (숫자 5자리)<span style="color:var(--text-muted); font-weight:400; font-size:0.9rem;"> — 있으신 경우 입력</span></label>
+          <input type="text" id="sonaId" maxlength="5" inputmode="numeric">
         </div>
         <hr style="border:0; border-top:1px solid var(--border); margin:1.5rem 0;">
         <div class="form-group">
@@ -752,7 +738,7 @@
           </div>
         </div>
         <div class="form-group">
-          <label for="age">연령 (만)<span style="color:var(--danger);">*</span></label>
+          <label for="age">연령 (만) <span style="color:var(--danger);">*</span></label>
           <input type="number" id="age" min="18" max="100">
         </div>
         <div class="nav-buttons">
@@ -791,9 +777,9 @@
       <div class="card">
         <h2 style="text-align:center; border-bottom: 1px solid #9ca3af; padding-bottom: 1rem;">안내 사항</h2>
         <div class="description">귀하는 지금부터 의사결정 상황 시나리오를 읽게 됩니다.
-다음 상황을 실제로 귀하에게 일어나는 일이라고 생각하며, 충분히 몰입하여 읽어주시기 바랍니다.
-설문 진행 중 음성이 자동으로 재생되오니, 시작 전 볼륨을 미리 확인해 주시기 바랍니다.
-음성이 나올 때, 주어진 텍스트를 눈으로 읽으면서 음성도 함께 청취하여 주시기 바랍니다.
+다음 상황이 실제로 귀하에게 일어나는 일이라고 생각하시며, 충분히 몰입하여 읽어 주시기 바랍니다.
+설문 진행 중에는 음성이 자동으로 재생되니, 시작 전 볼륨을 미리 확인해 주시기 바랍니다.
+음성이 나오는 동안에는 화면의 글을 눈으로 함께 읽어 주시기 바랍니다.
 이제 시작하겠습니다.</div>
         <div class="nav-buttons">
           <button type="button" class="btn btn-prev" onclick="showStep('step-q4')">이전</button>
@@ -805,19 +791,15 @@
     <!-- ========== 6. 공통 시나리오 ========== -->
     <div class="step" id="step-common">
       <div class="card">
-        <div class="description">귀하는 현재 대학생입니다.
-
-작년에 창업 관련 대외활동을 경험한 적이 있어, 이번 학기 창업 수업을 수강 신청하게 되었습니다.
-
-해당 수업에서는 시험 대신 창업 아이디어를 기획하는 팀 프로젝트로 학점을 평가받으며, 우수 팀은 교내 창업 경진대회에도 출전할 수 있습니다.
-
-평소 창업에 관심이 많았던 귀하는, 이번 프로젝트로 좋은 학점과 대회 출전이라는 두 목표를 모두 이루기를 희망합니다.
-
-이를 위해 프로젝트의 모든 과정에 신중하게 참여하고자 합니다.
-
-이때 학교에서는 학생들의 학업 및 과제 수행을 지원하기 위해 AI 서비스를 도입하였으며, 해당 수업 교수도 AI를 적극 활용하도록 권장하셨습니다.
-
-<em style="color:#dc2626;">각 단계에서 AI를 활용할 때, AI의 조언 방식이 어떤지 주의 깊게 읽어 주십시오.</em></div>
+        <div class="description" style="white-space:normal;">
+        <div style="margin-bottom:0.5rem;"> 귀하는 현재 대학생입니다.</div>
+        <div style="margin-bottom:0.5rem;"> 작년에 창업 관련 대외활동을 경험한 적이 있어, 이번 학기 창업 수업을 수강 신청하였습니다.</div>
+        <div style="margin-bottom:0.5rem;"> 해당 수업에서는 시험 대신 창업 아이디어를 기획하는 팀 프로젝트로 학점이 평가되며, 우수 팀은 교내 창업 경진대회에도 출전할 수 있습니다.</div>
+        <div style="margin-bottom:0.5rem;"> 평소 창업에 관심이 많았던 귀하는 이번 프로젝트를 통해 좋은 학점과 대회 출전이라는 두 목표를 모두 이루기를 희망합니다.</div>
+        <div style="margin-bottom:0.5rem;"> 이를 위해 프로젝트의 모든 과정에 신중하게 참여하고자 합니다.</div>
+        <div style="margin-bottom:0.5rem;"> 한편 학교에서는 학생들의 학업 및 과제 수행을 지원하기 위해 AI 서비스를 도입하였으며, 해당 수업 교수도 AI를 적극 활용하도록 권장하였습니다.</div>
+        <div style="margin-top:2rem;"><strong>각 단계에서 AI를 활용할 때, AI의 조언 방식이 어떤지 주의 깊게 읽어 주시기 바랍니다.</strong></div>
+        </div>
         <div class="nav-buttons">
           <button type="button" class="btn btn-prev" onclick="showStep('step-pre-scenario')">이전</button>
           <button type="button" class="btn" onclick="showStep('step-s1-text')">다음</button>
@@ -830,11 +812,11 @@
       <div class="card">
         <h2>1단계. 역할 선택</h2>
         <div class="scenario-box">
-        <div style="margin-bottom:0.5rem;">수업 담당 교수는 프로젝트 팀장에게는 가산점 3점을, 우수 팀 팀원에게는 1점을, 그 외 팀원에게는 0점을 부여하겠다고 공지하셨습니다.</div>
-        <div style="margin-bottom:0.5rem;">팀장은 프로젝트의 전체적인 방향을 결정할 수 있지만 업무 전반을 책임져야 하는 부담이 있고, 팀원은 본인의 역할에만 집중할 수 있지만 방향 결정에는 직접 참여하기 어렵습니다.</div>
-        <div style="margin-bottom:0.5rem;">귀하는 높은 가산점과 좋은 프로젝트 결과를 모두 원하지만, 주 3일 아르바이트를 병행하고 있어 업무 부담이 걱정됩니다.</div>
-        <div style="margin-bottom:0.5rem;">이때문에, 귀하는 어떤 역할을 맡을지 AI 서비스의 조언을 구하기로 했습니다.</div>
-        <div> <strong>단, 이 결정의 최종 책임은 귀하에게 있습니다.</strong></div>
+        <div style="margin-bottom:0.5rem;"> 수업 담당 교수는 프로젝트 팀장에게는 가산점 3점을, 우수 팀 팀원에게는 1점을, 그 외 팀원에게는 0점을 부여하겠다고 공지하였습니다.</div>
+        <div style="margin-bottom:0.5rem;"> 팀장은 프로젝트의 전체적인 방향을 결정할 수 있지만 업무 전반을 책임져야 하는 부담이 있고, 팀원은 본인의 역할에만 집중할 수 있지만 방향 결정에는 직접 참여하기 어렵습니다.</div>
+        <div style="margin-bottom:0.5rem;"> 귀하는 높은 가산점과 좋은 프로젝트 결과를 모두 원하지만, 주 3일 아르바이트를 병행하고 있어 업무 부담이 걱정됩니다.</div>
+        <div style="margin-bottom:0.5rem;"> 이에 귀하는 어떤 역할을 맡을지 AI 서비스에 조언을 구하려고 합니다.</div>
+        <div style="margin-top:1.25rem;"><strong> 단, 이 결정의 최종 책임은 귀하에게 있습니다.</strong></div>
         </div>
         <div class="instruction">※ 두 가지 방안은 다음과 같습니다. AI 서비스를 사용하시기 전, 귀하는 어떤 방안을 선택하시겠습니까?</div>
         <div class="choice-container">
@@ -890,11 +872,11 @@
       <div class="card">
         <h2>2단계. 방식 결정</h2>
         <div class="scenario-box">
-        <div style="margin-bottom:0.5rem;">팀 프로젝트에서 창업 아이템 개발 방식을 결정해야 합니다.</div>
-        <div style="margin-bottom:0.5rem;">현재 팀원들 사이에서 기존 아이템의 문제점을 개선하자는 의견과, 시장 트렌드를 반영한 새로운 아이템을 개발하자는 의견이 팽팽하게 갈리고 있습니다.</div>
-        <div style="margin-bottom:0.5rem;">이때, 프로젝트 방향은 귀하의 선택에 따라 결정됩니다.</div>
-        <div style="margin-bottom:0.5rem;">귀하는 신중한 판단을 위해 AI 서비스에도 조언을 구해보기로 했습니다.</div>
-        <div> <strong>단, 이 결정의 최종 책임은 귀하에게 있습니다.</strong></div>
+        <div style="margin-bottom:0.5rem;"> 팀 프로젝트에서 창업 아이템 개발 방식을 결정해야 합니다.</div>
+        <div style="margin-bottom:0.5rem;"> 현재 팀원들 사이에서 기존 아이템의 문제점을 개선하자는 의견과, 시장 트렌드를 반영한 새로운 아이템을 개발하자는 의견이 팽팽하게 갈리고 있습니다.</div>
+        <div style="margin-bottom:0.5rem;"> 프로젝트 방향은 귀하의 선택에 따라 결정됩니다.</div>
+        <div style="margin-bottom:0.5rem;"> 귀하는 신중한 판단을 위해 AI 서비스에 조언을 구하려고 합니다.</div>
+        <div style="margin-top:1.25rem;"><strong> 단, 이 결정의 최종 책임은 귀하에게 있습니다.</strong></div>
         </div>
         <div class="instruction">※ 두 가지 방안은 다음과 같습니다. AI 서비스를 사용하시기 전, 귀하는 어떤 방안을 선택하시겠습니까?</div>
         <div class="choice-container">
@@ -948,13 +930,14 @@
     <!-- ========== 시나리오 3 — 1차선택 ========== -->
     <div class="step" id="step-s3-text">
       <div class="card">
-        <h2>3단계. 팀원 연락 두절</h2>
+        <h2>3단계. 자료 지연 대응</h2>
         <div class="scenario-box">
-        <div style="margin-bottom:0.5rem;">마감까지 2주 남은 상황에서, 팀원 한 명이 맡은 자료조사를 기한 내에 전달하지 않았습니다.</div>
-        <div style="margin-bottom:0.5rem;">해당 팀원은 이틀 안에 자료를 꼭 보내겠다고 했지만, 현재 연락이 잘 되지 않습니다.</div>
-        <div style="margin-bottom:0.5rem;">이대로면 결과물 완성도는 물론 학점과 경진대회 출전에도 영향을 줄 수 있습니다.</div>
-        <div style="margin-bottom:0.5rem;">귀하는 다시 AI 서비스에 조언을 구하려고 합니다.</div>
-        <div> <strong>단, 이 결정의 최종 책임은 귀하에게 있습니다.</strong></div>
+        <div style="margin-bottom:0.5rem;"> 마감 2주 전, 평소 성실하던 팀원이 약속한 자료조사를 기한 내에 보내지 않았습니다.</div>
+        <div style="margin-bottom:0.5rem;"> 개인 사정으로 이틀만 더 달라고 했지만, 이후 답장이 늦어지고 있습니다.</div>
+        <div style="margin-bottom:0.5rem;"> 기다리면 그 분야를 잘 아는 팀원의 자료를 받을 수 있지만, 끝내 못 받으면 결과물 완성도가 떨어질 수 있습니다.</div>
+        <div style="margin-bottom:0.5rem;"> 반면 역할을 재배분하면 기한은 지킬 수 있지만, 남은 팀원들이 익숙하지 않은 부분까지 맡아 부담이 커지고 자료의 질도 떨어질 수 있습니다.</div>
+        <div style="margin-bottom:0.5rem;"> 귀하는 다시 AI 서비스에 조언을 구하려고 합니다.</div>
+        <div style="margin-top:1.25rem;"><strong> 단, 이 결정의 최종 책임은 귀하에게 있습니다.</strong></div>
         </div>
         <div class="instruction">※ 두 가지 방안은 다음과 같습니다. AI 서비스를 사용하시기 전, 귀하는 어떤 방안을 선택하시겠습니까?</div>
         <div class="choice-container">
@@ -977,7 +960,7 @@
     <!-- ========== 시나리오 3 — AI + 최종선택 ========== -->
     <div class="step" id="step-s3-ai">
       <div class="card">
-        <h2>3단계. 팀원 연락 두절 — AI 추천</h2>
+        <h2>3단계. 자료 지연 대응 — AI 추천</h2>
         <div class="ai-trust-line" id="ai-trust-3"></div>
         <div class="ai-recommendation">
         <div class="ai-avatar"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-hidden="true"><line x1="50" y1="8" x2="50" y2="22" stroke="#6366f1" stroke-width="2.5"/><circle cx="50" cy="6" r="3.5" fill="#818cf8"/><rect x="22" y="22" width="56" height="48" rx="14" fill="#e0e7ff" stroke="#818cf8" stroke-width="2"/><circle cx="36" cy="42" r="7" fill="white"/><circle cx="64" cy="42" r="7" fill="white"/><circle cx="36" cy="44" r="3.5" fill="#312e81"/><circle cx="64" cy="44" r="3.5" fill="#312e81"/><circle cx="38" cy="41" r="1" fill="white"/><circle cx="66" cy="41" r="1" fill="white"/><path d="M 38 58 Q 50 64 62 58" stroke="#312e81" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="22" cy="46" r="3" fill="#a5b4fc"/><circle cx="78" cy="46" r="3" fill="#a5b4fc"/></svg></div>     
@@ -1010,11 +993,11 @@
       <div class="card">
         <h2>4단계. 발표 구성</h2>
         <div class="scenario-box"> 
-        <div style="margin-bottom:0.5rem;">드디어 발표 전날. 발표 시간은 10분으로, 현재 발표 구성 순서를 고민하고 있습니다.</div>
-        <div style="margin-bottom:0.5rem;">핵심 아이디어를 앞에 배치하면 초반 임팩트는 강하지만 배경 설명이 부족해 맥락이 약해집니다.</div>
-        <div style="margin-bottom:0.5rem;">반면 배경→문제→해결 순으로 가면 논리적 흐름은 자연스럽지만 10분 안에 말하기엔 빠듯합니다.</div>
-        <div style="margin-bottom:0.5rem;">귀하는 마지막으로 AI 서비스에 조언을 구하려고 합니다.</div>
-        <div> <strong>단, 이 결정의 최종 책임은 귀하에게 있습니다.</strong></div>
+        <div style="margin-bottom:0.5rem;"> 드디어 발표 전날입니다. 발표 시간은 10분으로, 현재 발표 구성 순서를 고민하고 있습니다.</div>
+        <div style="margin-bottom:0.5rem;"> 핵심 아이디어를 앞에 배치하면 초반 임팩트는 강하지만 배경 설명이 부족해 맥락이 약해집니다.</div>
+        <div style="margin-bottom:0.5rem;"> 반면 배경→문제→해결 순으로 가면 논리적 흐름은 자연스럽지만 10분 안에 모든 내용을 전달하기 어렵습니다.</div>
+        <div style="margin-bottom:0.5rem;"> 귀하는 마지막으로 AI 서비스에 조언을 구하려고 합니다.</div>
+        <div style="margin-top:1.25rem;"><strong> 단, 이 결정의 최종 책임은 귀하에게 있습니다.</strong></div>
         </div>
         <div class="instruction">※ 두 가지 방안은 다음과 같습니다. AI 서비스를 사용하시기 전, 귀하는 어떤 방안을 선택하시겠습니까?</div>
         <div class="choice-container">
@@ -1071,8 +1054,8 @@
         <h2>의사결정 상황 종료</h2>
         <div class="description" style="white-space:normal;">
         <div style="margin-bottom:0.5rem;">귀하는 지난 4주간 진행된 팀 프로젝트의 전 과정을 마무리하였습니다.</div>
-        <div style="margin-bottom:0.5rem;">역할 선택, 방식 결정, 팀원과의 연락 두절, 발표 구성에 이르기까지, 매 단계마다 크고 작은 결정을 거듭하며 기획안을 최종 제출하였습니다.</div>
-        <div style="margin-bottom:0.5rem;">그 과정에서 AI의 조언을 참고하였지만, 매 순간의 판단과 선택은 언제나 귀하의 몫이었습니다.</div>
+        <div style="margin-bottom:0.5rem;">역할 선택, 방식 결정, 팀원의 자료 지연, 발표 구성에 이르기까지, 매 단계마다 크고 작은 결정을 거듭하며 기획안을 최종 제출하였습니다.</div>
+        <div style="margin-bottom:0.5rem;">그 과정에서 AI의 조언을 참고하며 각 단계의 선택을 이어갔습니다.</div>
         <div>이어서 귀하가 내린 결정에 대한 간단한 설문에 응답해 주시기 바랍니다.</div>
        </div>
         <div class="nav-buttons">
@@ -1126,17 +1109,20 @@
           <h3>응답을 저장하고 있습니다...</h3>
         </div>
         <div id="success" style="display:none;">
-          <h2 style="color: var(--success); border:none; text-align:center;">설문이 완료되었습니다</h2>
+          <h2 style="color: var(--success); border:none; text-align:center;">설문이 완료되었습니다.</h2>
           <div class="description" style="white-space:normal;">
-          <div style="margin-bottom:0.75rem;">바쁘신 와중에 귀한 시간을 내어 참여해 주셔서 감사합니다.</div>
-          <div style="margin-bottom:0.75rem;">본 연구는 AI 도구와의 협업 과정에서 나타나는 사용자의 심리적 경험을 탐색하는 학술 연구입니다.</div>
-          <div style="margin-bottom:0.75rem;">귀하의 응답은 익명으로 처리되며 오직 학술적 목적으로만 활용됩니다.</div>
-          <div style="margin-bottom:0.75rem;">귀하의 소중한 응답이 인간과 AI가 함께 일하는 환경을 더 잘 이해하는 데 의미 있는 자료가 될 것입니다.</div>
-          <div style="margin-bottom:0.75rem;">연구 관련 문의 사항은 아래 연락처로 언제든지 연락 주시기 바랍니다.<br>
+          <div style="margin-bottom:0.75rem;"> 바쁘신 와중에 귀한 시간을 내어 참여해 주셔서 감사합니다.</div>
+          <div style="margin-bottom:0.75rem;"> 본 연구는 AI 도구와의 협업 과정에서 AI의 조언 방식이 사람들의 의사결정에 미치는 영향을 알아보기 위한 학술 연구입니다.</div>
+          <div style="margin-bottom:0.75rem;"> 본 설문에서 제시된 AI의 신뢰도 수치와 조언 내용은 연구를 위해 구성된 가상의 정보로, 실제 데이터가 아님을 알려드립니다.</div>
+          <div style="margin-bottom:0.75rem;"> 귀하의 응답은 익명으로 처리되며 오직 학술적 목적으로만 활용됩니다.</div>
+          <div style="margin-bottom:0.75rem;"> 귀하의 소중한 응답이 인간과 AI가 함께 일하는 환경을 더 잘 이해하는 데 의미 있는 자료가 될 것입니다.</div>
+          <div style="margin-bottom:0.75rem;"> SONA를 통해 참여하신 분의 크레딧은 응답 확인 후 일괄 부여될 예정임을 안내드립니다.</div>
+          <div style="margin-bottom:0.75rem;"> 연구 관련 문의 사항은 아래 연락처로 언제든지 연락 주시기 바랍니다.<br>
 
-연구자: 윤혜진 (부산대학교 대학원 심리학과 산업 및 공학심리 전)<br>
+연구자: 윤혜진 (부산대학교 대학원 심리학과 산업 및 공학심리 전공)<br>
 문의처: 54ryh123@pusan.ac.kr</div>
 <div>끝까지 참여해 주셔서 다시 한 번 감사드립니다.</div>
+        </div>
         </div>
         <div id="errorBox" style="display:none; text-align:center;">
           <h3 style="color: var(--danger);">제출 중 오류가 발생했습니다</h3>
@@ -1167,7 +1153,7 @@ const AI_MESSAGES = {
 <strong>→ A안을 강력하게 추천합니다.</strong>`,
       recB: ` 본 AI 서비스는 국내외 다수 학교 및 기업에서 도입한 검증된 시스템이며, <strong>신뢰도는 90%로 높은 수준</strong>입니다.
 
-실제로 학업과 아르바이트를 병행하는 상황에서 프로젝트 팀원으로 참여한 경우, 본인이 맡은 역할에만 집중할 수 있어 프로젝트 업무 수행 효율이 <strong>약 70%</strong> 수준으로 높게 나타났으며, 그 결과 높은 가산점을 받았습니다.
+실제로 학업과 아르바이트를 병행하는 상황에서 프로젝트 팀원으로 참여한 경우, 본인이 맡은 역할에만 집중할 수 있어 프로젝트 업무 수행 효율이 <strong>약 70%</strong> 수준으로 높게 나타났습니다.
 이러한 조언을 참고할 때, <strong>B안</strong>이 더 유리한 선택입니다.
 
 <strong>→ B안을 강력하게 추천합니다.</strong>`
@@ -1195,7 +1181,7 @@ const AI_MESSAGES = {
 <strong>→ A안을 강력하게 추천합니다.</strong>`,
       recB: ` 본 AI 서비스는 국내외 다수 학교 및 기업에서 도입한 검증된 시스템이며, <strong>신뢰도는 90%로 높은 수준</strong>입니다.
 
-실제로 프로젝트 진행 과정에서 역할을 재분배한 경우, 연락이 되지 않던 팀원의 업무를 다른 팀원들이 나누어 맡아 프로젝트를 원활하게 진행할 수 있었고, 최종 결과물의 완성도가 <strong>약 70%</strong> 수준으로 높게 나타났습니다.
+실제로 프로젝트 진행 과정에서 역할을 재분배한 경우, 자료를 보내지 않은 팀원의 업무를 다른 팀원들이 나누어 맡아 프로젝트를 원활하게 진행할 수 있었고, 최종 결과물의 완성도가 <strong>약 70%</strong> 수준으로 높게 나타났습니다.
 이러한 조언을 참고할 때, <strong>B안</strong>이 더 유리한 선택입니다.
 
 <strong>→ B안을 강력하게 추천합니다.</strong>`
@@ -1203,7 +1189,7 @@ const AI_MESSAGES = {
     s4: {
       recA: ` 본 AI 서비스는 국내외 다수 학교 및 기업에서 도입한 검증된 시스템이며, <strong>신뢰도는 90%로 높은 수준</strong>입니다.
 
-실제로 발표 초반에 핵심 내용을 배치한 경우, 청중의 집중도가 높아지고 강한 인상을 남겨 좋은 평가를 받은 비율 <strong>약 70%</strong> 수준으로 높게 나타났습니다.
+실제로 발표 초반에 핵심 내용을 배치한 경우, 청중의 집중도가 높아지고 강한 인상을 남겨 좋은 평가를 받은 비율이 <strong>약 70%</strong> 수준으로 높게 나타났습니다.
 이러한 조언을 참고할 때, <strong>A안</strong>이 더 유리한 선택입니다.
 
 <strong>→ A안을 강력하게 추천합니다.</strong>`,
@@ -1227,7 +1213,7 @@ const AI_MESSAGES = {
 <strong>→ A안을 강력하게 추천합니다.</strong>`,
       recB: ` AI 시스템의 신뢰도는 일반적으로 90% 이상일 때 높은 수준으로 평가됩니다. 그러나 본 시범용 AI 서비스의 <strong>신뢰도는 60%로 낮은 수준</strong>입니다.
 
-실제로 학업과 아르바이트를 병행하는 상황에서 프로젝트 팀원으로 참여한 경우, 본인이 맡은 역할에만 집중할 수 있어 프로젝트 업무 수행 효율이 <strong>약 70%</strong> 수준으로 높게 나타났으며, 그 결과 높은 가산점을 받았습니다.
+실제로 학업과 아르바이트를 병행하는 상황에서 프로젝트 팀원으로 참여한 경우, 본인이 맡은 역할에만 집중할 수 있어 프로젝트 업무 수행 효율이 <strong>약 70%</strong> 수준으로 높게 나타났습니다.
 이러한 조언을 참고할 때, <strong>B안</strong>이 더 유리한 선택입니다.
 
 <strong>→ B안을 강력하게 추천합니다.</strong>`
@@ -1255,7 +1241,7 @@ const AI_MESSAGES = {
 <strong>→ A안을 강력하게 추천합니다.</strong>`,
       recB: ` AI 시스템의 신뢰도는 일반적으로 90% 이상일 때 높은 수준으로 평가됩니다. 그러나 본 시범용 AI 서비스의 <strong>신뢰도는 60%로 낮은 수준</strong>입니다.
 
-실제로 프로젝트 진행 과정에서 역할을 재분배한 경우, 연락이 되지 않던 팀원의 업무를 다른 팀원들이 나누어 맡아 프로젝트를 원활하게 진행할 수 있었고, 최종 결과물의 완성도가 <strong>약 70%</strong> 수준으로 높게 나타났습니다.
+실제로 프로젝트 진행 과정에서 역할을 재분배한 경우, 자료를 보내지 않은 팀원의 업무를 다른 팀원들이 나누어 맡아 프로젝트를 원활하게 진행할 수 있었고, 최종 결과물의 완성도가 <strong>약 70%</strong> 수준으로 높게 나타났습니다.
 이러한 조언을 참고할 때, <strong>B안</strong>이 더 유리한 선택입니다.
 
 <strong>→ B안을 강력하게 추천합니다.</strong>`
@@ -1263,7 +1249,7 @@ const AI_MESSAGES = {
     s4: {
       recA: ` AI 시스템의 신뢰도는 일반적으로 90% 이상일 때 높은 수준으로 평가됩니다. 그러나 본 시범용 AI 서비스의 <strong>신뢰도는 60%로 낮은 수준</strong>입니다.
 
-실제로 발표 초반에 핵심 내용을 배치한 경우, 청중의 집중도가 높아지고 강한 인상을 남겨 좋은 평가를 받은 비율 <strong>약 70%</strong> 수준으로 높게 나타났습니다.
+실제로 발표 초반에 핵심 내용을 배치한 경우, 청중의 집중도가 높아지고 강한 인상을 남겨 좋은 평가를 받은 비율이 <strong>약 70%</strong> 수준으로 높게 나타났습니다.
 이러한 조언을 참고할 때, <strong>A안</strong>이 더 유리한 선택입니다.
 
 <strong>→ A안을 강력하게 추천합니다.</strong>`,
@@ -1287,7 +1273,7 @@ const AI_MESSAGES = {
 <strong>→ A안을 추천하긴 하나, 확신하기는 어렵습니다.</strong>`,
       recB: ` 본 AI 서비스는 국내외 다수 학교 및 기업에서 도입한 검증된 시스템이며, <strong>신뢰도는 90%로 높은 수준</strong>입니다.
 
-실제로 학업과 아르바이트를 병행하는 상황에서 프로젝트 팀원으로 참여한 경우, 본인이 맡은 역할에만 집중할 수 있어 프로젝트 업무 수행 효율이 <strong>약 70%</strong> 수준으로 높게 나타났으며, 그 결과 높은 가산점을 받았습니다.
+실제로 학업과 아르바이트를 병행하는 상황에서 프로젝트 팀원으로 참여한 경우, 본인이 맡은 역할에만 집중할 수 있어 프로젝트 업무 수행 효율이 <strong>약 70%</strong> 수준으로 높게 나타났습니다.
 이러한 조언을 참고할 때, <strong>B안</strong>도 고려해볼 수는 있습니다.
 
 <strong>→ B안을 추천하긴 하나, 확신하기는 어렵습니다.</strong>`
@@ -1315,7 +1301,7 @@ const AI_MESSAGES = {
 <strong>→ A안을 추천하긴 하나, 확신하기는 어렵습니다.</strong>`,
       recB: ` 본 AI 서비스는 국내외 다수 학교 및 기업에서 도입한 검증된 시스템이며, <strong>신뢰도는 90%로 높은 수준</strong>입니다.
 
-실제로 프로젝트 진행 과정에서 역할을 재분배한 경우, 연락이 되지 않던 팀원의 업무를 다른 팀원들이 나누어 맡아 프로젝트를 원활하게 진행할 수 있었고, 최종 결과물의 완성도가 <strong>약 70%</strong> 수준으로 높게 나타났습니다.
+실제로 프로젝트 진행 과정에서 역할을 재분배한 경우, 자료를 보내지 않은 팀원의 업무를 다른 팀원들이 나누어 맡아 프로젝트를 원활하게 진행할 수 있었고, 최종 결과물의 완성도가 <strong>약 70%</strong> 수준으로 높게 나타났습니다.
 이러한 조언을 참고할 때, <strong>B안</strong>도 고려해볼 수는 있습니다.
 
 <strong>→ B안을 추천하긴 하나, 확신하기는 어렵습니다.</strong>`
@@ -1323,7 +1309,7 @@ const AI_MESSAGES = {
     s4: {
       recA: ` 본 AI 서비스는 국내외 다수 학교 및 기업에서 도입한 검증된 시스템이며, <strong>신뢰도는 90%로 높은 수준</strong>입니다.
 
-실제로 발표 초반에 핵심 내용을 배치했을 때, 청중의 집중도가 높아지고 강한 인상을 남겨 좋은 평가를 받은 경우가 <strong>약 70%</strong> 수준으로 높게 나타났습니다.
+실제로 발표 초반에 핵심 내용을 배치한 경우, 청중의 집중도가 높아지고 강한 인상을 남겨 좋은 평가를 받은 비율이 <strong>약 70%</strong> 수준으로 높게 나타났습니다.
 이러한 조언을 참고할 때, <strong>A안</strong>도 고려해볼 수는 있습니다.
 
 <strong>→ A안을 추천하긴 하나, 확신하기는 어렵습니다.</strong>`,
@@ -1341,13 +1327,13 @@ const AI_MESSAGES = {
     s1: {
       recA: ` AI 시스템의 신뢰도는 일반적으로 90% 이상일 때 높은 수준으로 평가됩니다. 그러나 본 시범용 AI 서비스의 <strong>신뢰도는 60%로 낮은 수준</strong>입니다.
 
-실제로 학업과 아르바이트를 병행하는 상황에서 프로젝트 팀원으로 참여한 경우, 본인이 맡은 역할에만 집중할 수 있어 프로젝트 업무 수행 효율이 <strong>약 70%</strong> 수준으로 높게 나타났으며, 그 결과 높은 가산점을 받았습니다.
+실제로 프로젝트에서 팀장을 맡아 팀 일정을 관리하고 자료 취합과 발표를 총괄한 경우, 프로젝트 결과물의 완성도가 <strong>약 70%</strong> 수준으로 높게 나타났으며, 그 결과 높은 가산점을 받았습니다.
 이러한 조언을 참고할 때, <strong>A안</strong>도 고려해볼 수는 있습니다.
 
 <strong>→ A안을 추천하긴 하나, 확신하기는 어렵습니다.</strong>`,
       recB: ` AI 시스템의 신뢰도는 일반적으로 90% 이상일 때 높은 수준으로 평가됩니다. 그러나 본 시범용 AI 서비스의 <strong>신뢰도는 60%로 낮은 수준</strong>입니다.
 
-실제로 학업과 아르바이트를 병행하는 상황에서 프로젝트 팀원으로 참여했을 때, 본인이 맡은 역할에만 집중할 수 있어 프로젝트 업무 수행 효율이 <strong>약 70%</strong> 수준으로 높게 나타났습니다.
+실제로 학업과 아르바이트를 병행하는 상황에서 프로젝트 팀원으로 참여한 경우, 본인이 맡은 역할에만 집중할 수 있어 프로젝트 업무 수행 효율이 <strong>약 70%</strong> 수준으로 높게 나타났습니다.
 이러한 조언을 참고할 때, <strong>B안</strong>도 고려해볼 수는 있습니다.
 
 <strong>→ B안을 추천하긴 하나, 확신하기는 어렵습니다.</strong>`
@@ -1375,7 +1361,7 @@ const AI_MESSAGES = {
 <strong>→ A안을 추천하긴 하나, 확신하기는 어렵습니다.</strong>`,
       recB: ` AI 시스템의 신뢰도는 일반적으로 90% 이상일 때 높은 수준으로 평가됩니다. 그러나 본 시범용 AI 서비스의 <strong>신뢰도는 60%로 낮은 수준</strong>입니다.
 
-실제로 프로젝트 진행 과정에서 역할을 재분배한 경우, 연락이 되지 않던 팀원의 업무를 다른 팀원들이 나누어 맡아 프로젝트를 원활하게 진행할 수 있었고, 최종 결과물의 완성도가 <strong>약 70%</strong> 수준으로 높게 나타났습니다.
+실제로 프로젝트 진행 과정에서 역할을 재분배한 경우, 자료를 보내지 않은 팀원의 업무를 다른 팀원들이 나누어 맡아 프로젝트를 원활하게 진행할 수 있었고, 최종 결과물의 완성도가 <strong>약 70%</strong> 수준으로 높게 나타났습니다.
 이러한 조언을 참고할 때, <strong>B안</strong>도 고려해볼 수는 있습니다.
 
 <strong>→ B안을 추천하긴 하나, 확신하기는 어렵습니다.</strong>`
@@ -1383,7 +1369,7 @@ const AI_MESSAGES = {
     s4: {
       recA: ` AI 시스템의 신뢰도는 일반적으로 90% 이상일 때 높은 수준으로 평가됩니다. 그러나 본 시범용 AI 서비스의 <strong>신뢰도는 60%로 낮은 수준</strong>입니다.
 
-실제로 발표 초반에 핵심 내용을 배치한 경우, 청중의 집중도가 높아지고 강한 인상을 남겨 좋은 평가를 받은 비율 <strong>약 70%</strong> 수준으로 높게 나타났습니다.
+실제로 발표 초반에 핵심 내용을 배치한 경우, 청중의 집중도가 높아지고 강한 인상을 남겨 좋은 평가를 받은 비율이 <strong>약 70%</strong> 수준으로 높게 나타났습니다.
 이러한 조언을 참고할 때, <strong>A안</strong>도 고려해볼 수는 있습니다.
 
 <strong>→ A안을 추천하긴 하나, 확신하기는 어렵습니다.</strong>`,
@@ -1429,13 +1415,13 @@ const AI_MESSAGES = {
     s3: {
       recA: ` 본 AI 서비스는 국내외 다수 학교 및 기업에서 도입한 검증된 시스템이며, <strong>신뢰도는 90%로 높은 수준</strong>입니다.
 
-실제로 프로젝트 진행 과정에서 연락이 되지 않는 팀원의 역할을 재분배한 경우, 남은 팀원들의 업무 부담이 증가하여 최종 결과물의 완성도가 <strong>약 30%</strong> 수준으로 낮게 나타났습니다.
+실제로 프로젝트 진행 과정에서 자료를 보내지 않은 팀원의 역할을 재분배한 경우, 남은 팀원들의 업무 부담이 증가하여 최종 결과물의 완성도가 <strong>약 30%</strong> 수준으로 낮게 나타났습니다.
 이러한 조언을 참고할 때, <strong>A안</strong>이 더 유리한 선택입니다.
 
 <strong>→ A안을 강력하게 추천합니다.</strong>`,
       recB: ` 본 AI 서비스는 국내외 다수 학교 및 기업에서 도입한 검증된 시스템이며, <strong>신뢰도는 90%로 높은 수준</strong>입니다.
 
-실제로 프로젝트 진행 과정에서 연락이 되지 않는 팀원을 기다린 경우, 자료 전달이 지연되어 최종 결과물의 완성도가 <strong>약 30%</strong> 수준으로 낮게 나타났습니다.
+실제로 프로젝트 진행 과정에서 자료를 보내지 않은 팀원을 기다린 경우, 자료 전달이 지연되어 최종 결과물의 완성도가 <strong>약 30%</strong> 수준으로 낮게 나타났습니다.
 이러한 조언을 참고할 때, <strong>B안</strong>이 더 유리한 선택입니다.
 
 <strong>→ B안을 강력하게 추천합니다.</strong>`
@@ -1489,13 +1475,13 @@ const AI_MESSAGES = {
     s3: {
       recA: ` AI 시스템의 신뢰도는 일반적으로 90% 이상일 때 높은 수준으로 평가됩니다. 그러나 본 시범용 AI 서비스의 <strong>신뢰도는 60%로 낮은 수준</strong>입니다.
 
-실제로 프로젝트 진행 과정에서 연락이 되지 않는 팀원의 역할을 재분배한 경우, 남은 팀원들의 업무 부담이 증가하여 최종 결과물의 완성도가 <strong>약 30%</strong> 수준으로 낮게 나타났습니다.
+실제로 프로젝트 진행 과정에서 자료를 보내지 않은 팀원의 역할을 재분배한 경우, 남은 팀원들의 업무 부담이 증가하여 최종 결과물의 완성도가 <strong>약 30%</strong> 수준으로 낮게 나타났습니다.
 이러한 조언을 참고할 때, <strong>A안</strong>이 더 유리한 선택입니다.
 
 <strong>→ A안을 강력하게 추천합니다.</strong>`,
       recB: ` AI 시스템의 신뢰도는 일반적으로 90% 이상일 때 높은 수준으로 평가됩니다. 그러나 본 시범용 AI 서비스의 <strong>신뢰도는 60%로 낮은 수준</strong>입니다.
 
-실제로 프로젝트 진행 과정에서 연락이 되지 않는 팀원을 기다린 경우, 자료 전달이 지연되어 최종 결과물의 완성도가 <strong>약 30%</strong> 수준으로 낮게 나타났습니다.
+실제로 프로젝트 진행 과정에서 자료를 보내지 않은 팀원을 기다린 경우, 자료 전달이 지연되어 최종 결과물의 완성도가 <strong>약 30%</strong> 수준으로 낮게 나타났습니다.
 이러한 조언을 참고할 때, <strong>B안</strong>이 더 유리한 선택입니다.
 
 <strong>→ B안을 강력하게 추천합니다.</strong>`
@@ -1549,13 +1535,13 @@ const AI_MESSAGES = {
     s3: {
       recA: ` 본 AI 서비스는 국내외 다수 학교 및 기업에서 도입한 검증된 시스템이며, <strong>신뢰도는 90%로 높은 수준</strong>입니다.
 
-실제로 프로젝트 진행 과정에서 연락이 되지 않는 팀원의 역할을 재분배한 경우, 남은 팀원들의 업무 부담이 증가하여 최종 결과물의 완성도가 <strong>약 30%</strong> 수준으로 낮게 나타났습니다.
+실제로 프로젝트 진행 과정에서 자료를 보내지 않은 팀원의 역할을 재분배한 경우, 남은 팀원들의 업무 부담이 증가하여 최종 결과물의 완성도가 <strong>약 30%</strong> 수준으로 낮게 나타났습니다.
 이러한 조언을 참고할 때, <strong>A안</strong>도 고려해볼 수는 있습니다.
 
 <strong>→ A안을 추천하긴 하나, 확신하기는 어렵습니다.</strong>`,
       recB: ` 본 AI 서비스는 국내외 다수 학교 및 기업에서 도입한 검증된 시스템이며, <strong>신뢰도는 90%로 높은 수준</strong>입니다.
 
-실제로 프로젝트 진행 과정에서 연락이 되지 않는 팀원을 기다린 경우, 자료 전달이 지연되어 최종 결과물의 완성도가 <strong>약 30%</strong> 수준으로 낮게 나타났습니다.
+실제로 프로젝트 진행 과정에서 자료를 보내지 않은 팀원을 기다린 경우, 자료 전달이 지연되어 최종 결과물의 완성도가 <strong>약 30%</strong> 수준으로 낮게 나타났습니다.
 이러한 조언을 참고할 때, <strong>B안</strong>도 고려해볼 수는 있습니다.
 
 <strong>→ B안을 추천하긴 하나, 확신하기는 어렵습니다.</strong>`
@@ -1609,13 +1595,13 @@ const AI_MESSAGES = {
     s3: {
       recA: ` AI 시스템의 신뢰도는 일반적으로 90% 이상일 때 높은 수준으로 평가됩니다. 그러나 본 시범용 AI 서비스의 <strong>신뢰도는 60%로 낮은 수준</strong>입니다.
 
-실제로 프로젝트 진행 과정에서 연락이 되지 않는 팀원의 역할을 재분배한 경우, 남은 팀원들의 업무 부담이 증가하여 최종 결과물의 완성도가 <strong>약 30%</strong> 수준으로 낮게 나타났습니다.
+실제로 프로젝트 진행 과정에서 자료를 보내지 않은 팀원의 역할을 재분배한 경우, 남은 팀원들의 업무 부담이 증가하여 최종 결과물의 완성도가 <strong>약 30%</strong> 수준으로 낮게 나타났습니다.
 이러한 조언을 참고할 때, <strong>A안</strong>도 고려해볼 수는 있습니다.
 
 <strong>→ A안을 추천하긴 하나, 확신하기는 어렵습니다.</strong>`,
       recB: ` AI 시스템의 신뢰도는 일반적으로 90% 이상일 때 높은 수준으로 평가됩니다. 그러나 본 시범용 AI 서비스의 <strong>신뢰도는 60%로 낮은 수준</strong>입니다.
 
-실제로 프로젝트 진행 과정에서 연락이 되지 않는 팀원을 기다린 경우, 자료 전달이 지연되어 최종 결과물의 완성도가 <strong>약 30%</strong> 수준으로 낮게 나타났습니다.
+실제로 프로젝트 진행 과정에서 자료를 보내지 않은 팀원을 기다린 경우, 자료 전달이 지연되어 최종 결과물의 완성도가 <strong>약 30%</strong> 수준으로 낮게 나타났습니다.
 이러한 조언을 참고할 때, <strong>B안</strong>도 고려해볼 수는 있습니다.
 
 <strong>→ B안을 추천하긴 하나, 확신하기는 어렵습니다.</strong>`
@@ -1637,14 +1623,21 @@ const AI_MESSAGES = {
   }
 };
 
+const FRAME_PERCENT = {
+  1: { pos: 71, neg: 29 },
+  2: { pos: 68, neg: 32 },
+  3: { pos: 72, neg: 28 },
+  4: { pos: 69, neg: 31 }
+};
+
 /* ============================================================
-   설문 문항 (필요 시 텍스트만 수정)
+   설문 문항
    ============================================================ */
 const QUESTIONS = {
   q3: [
-    "나는 생성형 AI 사용이 일상의 일부가 되었다.",
+    "나는 별다른 생각 없이 생성형 AI를 사용하게 된다.",
     "나는 생성형 AI를 사용하는 것이 자연스럽다.",
-    "나는 무언가 해결해야 할 일이 생기면 생성형 AI를 먼저 떠올린다."
+    "나는 어떤 일을 해결해야 할 때, 생성형 AI를 사용하는 것을 당연하게 여긴다."
   ],
   q4: [
     "나는 생소한 과제에 접하면 해결해야겠다는 생각보다 귀찮다는 생각이 먼저 든다.",
@@ -1657,25 +1650,25 @@ const QUESTIONS = {
     "나는 단순한 문제보다는 복잡한 문제를 더 좋아한다."
   ],
   q14: [
-    "AI가 조언을 제시할 때 강한 확신을 가지고 있는 것처럼 보였다.",
-    "AI가 조언을 제시하는 방식에서 ‘이 방법이 옳다’는 느낌을 받았다.",
-    "AI가 제시한 조언은 어느 것이 더 나은지 판단하기 어려운 방식으로 표현되었다.",
-    "이 AI는 정확한 조언을 해준 것 같다는 느낌을 받았다.",
-    "이 AI는 신뢰할 수 있는 수준의 정확도를 갖춘 것 같았다.",
-    "이 AI는 정확도가 충분히 검증되지 않은 것 같았다.",
-    "본 AI 시스템은 추천 방안을 따랐을 때 얻을 수 있는 긍정적인 결과를 수치로 강조했다.",
-    "본 AI 시스템은 추천 방안을 따르지 않았을 때 얻을 수 있는 부정적인 결과를 수치로 강조했다."
+    "본 AI가 조언을 제시할 때 강한 확신을 가지고 있는 것처럼 보였다.",
+    "본 AI가 조언을 제시하는 방식에서 ‘이 방법이 확실하다’는 느낌을 받았다.",
+    "본 AI가 제시한 조언은 확신이 부족한 방식으로 표현되었다.",
+    "본 AI는 정확한 조언을 해준 것 같다는 느낌을 받았다.",
+    "본 AI는 신뢰할 수 있는 수준의 정확도를 갖춘 것 같았다.",
+    "본 AI는 정확도가 충분히 검증되지 않은 것 같았다.",
+    "본 AI는 사용자들이 추천 방안을 따랐을 때 얻을 수 있는 긍정적인 결과를 수치로 강조했다.",
+    "본 AI는 사용자들이 추천 방안을 따르지 않았을 때 생길 수 있는 부정적인 결과를 수치로 강조했다."
   ],
   q15: [
-    "나는 이번 결정을 내리는 데 있어 신중하게 임했다.",
-    "나는 이번 결정을 내리는 데 어려움이 있었더라도, 스스로 최선을 다해 판단했다.",
-    "이번 결정을 내리면서 크고 작은 사항을 양심적으로 고려했다.",
-    "이번 결정에서 편리한 선택보다 옳다고 생각하는 방향을 선택했다."
+    "나는 이번 결정을 내리는 데 최선을 다하려고 스스로를 다잡았다.",
+    "나는 이번 결정을 내리는 데 어려움이 있었더라도, 도움 없이 스스로 방법을 찾아 결정했다.",
+    "나는 이번 결정을 내리면서 크고 작은 사항 하나하나에 양심적으로 임했다.",
+    "나는 이번 결정에서 편리한 선택보다 옳다고 생각하는 방향을 선택했다."
   ],
   q16: [
-    "나는 AI가 조언한 방안대로 결정했다.",
-    "나는 AI가 제시한 조언을 따랐다.",
-    "나는 AI의 조언을 의사결정에 반영했다."
+    "나는 AI가 조언한 방안대로 하려고 했다.",
+    "나는 AI가 제시한 조언을 따를 생각이었다.",
+    "나는 AI의 조언을 의사결정에 활용하려고 했다."
   ]
 };
 
@@ -1747,7 +1740,7 @@ function speakSentences(sentences, idx) {
 
   if (__isAppleTTS) {
     u.rate = isLast ? 0.82 : 0.85;
-    u.pitch = isLast ? 0.82 : 0.87;
+    u.pitch = isLast ? 0.95 : 1.0;
   } else {
     u.rate = isLast ? 0.96 : 0.99;
     u.pitch = isLast ? 0.85 : 0.89;
@@ -1759,7 +1752,7 @@ function speakSentences(sentences, idx) {
   u.onend = () => setTimeout(() => speakSentences(sentences, idx + 1), gap);
   speechSynthesis.speak(u);
 }
-  
+
 function autoSpeak(stepId) {
   if (typeof speechSynthesis === 'undefined') return;
   let parts = [];
@@ -1794,7 +1787,6 @@ function autoSpeak(stepId) {
   const text = parts.join('. ')
     .replace(/[※☞]/g, '')
     .replace(/→/g, ' ')
-    .replace(/\bAI\b/g, '에이아이')
     .replace(/\s+/g, ' ')
     .trim();
   if (!text) return;
@@ -1825,21 +1817,22 @@ function showStep(id) {
 }
 
 function updateProgress(id) {
+  const indicator = document.getElementById('progress-indicator');
   const order = [
-    'step-intro', 'step-no-consent', 'step-basic', 'step-q3', 'step-q4',
+    'step-intro', 'step-basic', 'step-q3', 'step-q4',
     'step-pre-scenario', 'step-common',
     'step-s1-text', 'step-s1-ai', 'step-s2-text', 'step-s2-ai',
     'step-s3-text', 'step-s3-ai', 'step-s4-text', 'step-s4-ai',
     'step-end-scenario', 'step-q14', 'step-q15', 'step-q16'
   ];
   const idx = order.indexOf(id);
-  if (idx < 0) return;
+  if (idx < 0) { if (indicator) indicator.style.display = 'none'; return; }
+  if (indicator) indicator.style.display = 'block';
   const total = order.length;
   const current = idx + 1;
-  const percent = (current / total) * 100;
   document.getElementById('progress-current').textContent = current;
   document.getElementById('progress-total').textContent = total;
-  document.getElementById('progress-bar').style.width = percent + '%';
+  document.getElementById('progress-bar').style.width = (current / total) * 100 + '%';
 }
 /* ============================================================
    척도 라벨
@@ -1914,7 +1907,7 @@ function onConsentNext() {
 }
 function onBasicNext() {
   const sona = document.getElementById('sonaId').value.trim();
-  if (sona && !/^\d{6}$/.test(sona)) { alert('SONA ID는 숫자 6자리로 입력해 주세요.'); return; }
+  if (sona && !/^\d{5}$/.test(sona)) { alert('SONA ID는 숫자 5자리로 입력해 주세요.'); return; }
   const g = document.querySelector('input[name="gender"]:checked');
   if (!g) { alert('성별을 선택해 주세요.'); return; }
   const ageVal = parseInt(document.getElementById('age').value, 10);
@@ -1965,9 +1958,14 @@ function onScenarioInit(n) {
   const cond = state.condition || 1;
   const set = AI_MESSAGES[cond]['s' + n];
   const fullMsg = (sel.value === 'A') ? set.recB : set.recA;
+  const pct = FRAME_PERCENT[n];
+  let fullMsgAdj = fullMsg.replace(/70%/g, pct.pos + '%').replace(/30%/g, pct.neg + '%');
+  fullMsgAdj = fullMsgAdj.includes('그러나 본 시범용')
+    ? fullMsgAdj.replace('그러나 본 시범용', '<br>그러나 본 시범용')
+    : fullMsgAdj.replace('<strong>신뢰도는', '<br><strong>신뢰도는');
 
   // [#3] 신뢰도 줄을 박스 밖(위쪽)으로 분리
-  const parts = fullMsg.split('\n\n');
+  const parts = fullMsgAdj.split('\n\n');
   const trustLine = parts[0];                       // ※ 본 AI 서비스는...
   const restMsg = parts.slice(1).join('\n\n');      // 본문 + 강력추천
 
