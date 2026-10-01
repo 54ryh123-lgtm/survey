@@ -1797,7 +1797,7 @@ function autoSpeak(stepId) {
   const sentences = [];
   raw.forEach(s => {
     const last = sentences[sentences.length - 1];
-    if (last && (last + ' ' + s).length <= 120) {
+    if (last && (last + ' ' + s).length <= 160) {
       sentences[sentences.length - 1] = last + ' ' + s;
     } else {
       sentences.push(s);
