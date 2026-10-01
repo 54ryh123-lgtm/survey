@@ -1748,7 +1748,7 @@ function speakSentences(sentences, idx) {
 
   u.volume = 1.0;
   if (__koreanVoice) u.voice = __koreanVoice;
-  const gap = __isAppleTTS ? 260 : 145;
+  const gap = __isAppleTTS ? 140 : 120;
   u.onend = () => setTimeout(() => speakSentences(sentences, idx + 1), gap);
   speechSynthesis.speak(u);
 }
