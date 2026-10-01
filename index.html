@@ -1739,7 +1739,7 @@ function speakSentences(sentences, idx) {
   const isLast = idx === sentences.length - 1;
 
   if (__isAppleTTS) {
-    u.rate = isLast ? 0.82 : 0.85;
+    u.rate = isLast ? 0.86 : 0.9;
     u.pitch = isLast ? 0.82 : 0.85;
   } else {
     u.rate = isLast ? 0.96 : 0.99;
@@ -1787,7 +1787,7 @@ function autoSpeak(stepId) {
   const text = parts.join('. ')
     .replace(/[※☞]/g, '')
     .replace(/→/g, ' ')
-    .replace(/AI/g, '에이아이')
+    .replace(/AI/g, '에이 아이')
     .replace(/%/g, '퍼센트')
     .replace(/\s+/g, ' ')
     .trim();
