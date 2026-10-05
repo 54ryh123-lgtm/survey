@@ -2107,6 +2107,18 @@ buildScale('q3-container',  'q3',  QUESTIONS.q3,  7, ANCHORS_7);
   buildScale('q14-container', 'q14', QUESTIONS.q14, 7, ANCHORS_7);
   buildScale('q15-container', 'q15', QUESTIONS.q15, 7, ANCHORS_7);
   buildScale('q16-container', 'q16', QUESTIONS.q16, 7, ANCHORS_7);
+
+    // 서버 예열 — 첫 요청의 지연을 미리 없앰
+  setTimeout(() => {
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+      google.script.run.withSuccessHandler(() => {}).withFailureHandler(() => {}).checkSonaId('00000');
+    } else {
+      fetch(WEBAPP_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'checkSonaId', sonaId: '00000' })
+      }).catch(() => {});
+    }
+  }, 1500);
 });
 </script>
 </body>
