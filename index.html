@@ -727,7 +727,7 @@
         <h2>기본 정보</h2>
         <div class="form-group">
           <label for="sonaId">SONA ID (숫자 5자리)<span style="color:var(--text-muted); font-weight:400; font-size:0.9rem;"> — 있으신 경우 입력</span></label>
-          <input type="text" id="sonaId" maxlength="5" inputmode="numeric">
+          <input type="text" id="sonaId" maxlength="5" inputmode="numeric" onblur="prefetchSonaCheck()" oninput="if(this.value.trim().length>=5) prefetchSonaCheck();">
         </div>
         <hr style="border:0; border-top:1px solid var(--border); margin:1.5rem 0;">
         <div class="form-group">
@@ -1821,6 +1821,29 @@ function showStep(id) {
  updateProgress(id);
 }
 
+let __sonaCheck = { id: null, duplicate: false };
+
+function prefetchSonaCheck() {
+  const el = document.getElementById('sonaId');
+  if (!el) return;
+  const val = (el.value || '').trim();
+  if (val === '' || val === __sonaCheck.id) return;
+  __sonaCheck = { id: val, duplicate: false };
+
+  const apply = (res) => {
+    if (res && __sonaCheck.id === val) __sonaCheck.duplicate = !!res.duplicate;
+  };
+
+  if (typeof google !== 'undefined' && google.script && google.script.run) {
+    google.script.run.withSuccessHandler(apply).withFailureHandler(() => {}).checkSonaId(val);
+  } else {
+    fetch(WEBAPP_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'checkSonaId', sonaId: val })
+    }).then(r => r.json()).then(apply).catch(() => {});
+  }
+}
+
 function updateProgress(id) {
   const indicator = document.getElementById('progress-indicator');
   const order = [
@@ -1917,6 +1940,10 @@ function onBasicNext() {
   if (!g) { alert('성별을 선택해 주세요.'); return; }
   const ageVal = parseInt(document.getElementById('age').value, 10);
   if (!ageVal || ageVal < 18 || ageVal > 100) { alert('연령을 만 18세 이상으로 올바르게 입력해 주세요.'); return; }
+  if (sona && __sonaCheck.id === sona && __sonaCheck.duplicate) {
+    alert('이미 참여하신 SONA ID입니다. 본 연구는 1인 1회만 참여할 수 있습니다.');
+    return;
+  }
   state.sonaId = sona; state.gender = g.value; state.age = ageVal;
   showStep('step-q3');
 }
