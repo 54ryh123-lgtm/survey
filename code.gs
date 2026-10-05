@@ -49,6 +49,17 @@ function submitSurvey(data) {
   }
 }
 
+function checkSonaId(sonaId) {
+  if (!sonaId || String(sonaId).trim() === '') return { duplicate: false };
+  const id = String(sonaId).trim();
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+  if (!sheet) return { duplicate: false };
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return { duplicate: false };
+  const ids = sheet.getRange(2, 4, lastRow - 1, 1).getValues();
+  return { duplicate: ids.some(r => String(r[0]).trim() === id) };
+}
+
 // 6.3 새 응답 제출 시 이메일 알림
 function sendNewResponseEmail(data) {
   try {
@@ -136,6 +147,8 @@ function doPost(e) {
     let result;
     if (data.action === 'assignCondition') {
       result = { condition: assignCondition() };
+    } else if (data.action === 'checkSonaId') {
+      result = checkSonaId(data.sonaId);
     } else {
       result = submitSurvey(data);
     }
