@@ -1683,7 +1683,7 @@ const KEY_MAPS = {
 /* ============================================================
    상태
    ============================================================ */
-const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwFbeK57bdPtmHViw7pu8UQsFnal0FWqhFfb_4cjxZHz4uwdv0V-f9lFB-2N_EKEBI/exec';
+const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwL7uJjATcnGKd2DmPAlYe3pnLbNqOD3G1QUMV1LmYopTKBtlGAaxCQNsfDE0fdGpw/exec';
 
 function callBackend(payload) {
   return fetch(WEBAPP_URL, {
@@ -1781,7 +1781,7 @@ function autoSpeak(stepId) {
   const text = parts.join('. ')
     .replace(/[※☞]/g, '')
     .replace(/→/g, ' ')
-    .replace(/AI/g, '에이 아이')
+    .replace(/AI/g, '에이아이')
     .replace(/%/g, '퍼센트')
     .replace(/\s+/g, ' ')
     .trim();
