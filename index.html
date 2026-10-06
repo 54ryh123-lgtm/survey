@@ -1814,7 +1814,7 @@ function showStep(id) {
   if (target) target.classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
   if (typeof speechSynthesis !== 'undefined') speechSynthesis.cancel();
-  setTimeout(() => autoSpeak(id), 400);
+  setTimeout(() => autoSpeak(id), 800);
   if (id === 'step-q4') prefetchCondition();
 
 // ↓↓↓ 진행도 업데이트 추가 ↓↓↓
